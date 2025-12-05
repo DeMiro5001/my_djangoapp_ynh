@@ -50,6 +50,110 @@ ram.runtime = "50M"
     help.fr = "Utilisez le champ aide pour ajouter une information à l'intention de l'administrateur à propos de cette question."
     type = "password"
 
+    [install.db_engine]
+    ask.en = "What database engine do you want to use ?"
+    ask.fr = "Quelle base de données voulez-vous utiliser ?"
+    type = "select"
+    choices = ["sqlite3", "postgresql" ]
+    default = "postgresql"
+    help = """Add this to the app configuration file :
+```
+                # settings.py
+                DB_ENGINE = env('DB_ENGINE', default='sqlite3')
+
+                if DB_ENGINE == 'postgresql':
+                    DATABASES = {
+                        'default': {
+                            'ENGINE': 'django.db.backends.postgresql',
+                            'NAME': env('DB_NAME', default='scientevent_db'),
+                            'USER': env('DB_USER', default=''),
+                            'PASSWORD': env('DB_PASSWORD', default=''),
+                            'HOST': env('DB_HOST', default='localhost'),
+                            'PORT': env('DB_PORT', default=''),
+                        }
+                    }
+                else:
+                    # Default to SQLite
+                    DATABASES = {
+                        'default': {
+                            'ENGINE': 'django.db.backends.sqlite3',
+                            'NAME': BASE_DIR / env('DB_NAME', default='db.sqlite3'),
+                        }
+                    }
+```
+    """
+
+    [install.use_redis]
+    ask.en = "Activate redis server"
+    ask.fr = "Activer le serveur redis"
+    type = "boolean"
+    default = false
+    help = """Add redis support to the app configuration file :
+```
+                # settings.py
+                CACHES = {
+                    'default': {
+                        'BACKEND': 'django_redis.cache.RedisCache',
+                        'LOCATION': os.getenv('REDIS_URL'),
+                        'OPTIONS': {
+                            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                            'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
+                            'SOCKET_CONNECT_TIMEOUT': 5,
+                            'SOCKET_TIMEOUT': 5,
+                            'CONNECTION_POOL_KWARGS': {'max_connections': 100},
+                        },
+                        'KEY_PREFIX': '__APP__',
+                    }
+                }
+
+                # Cache templates
+                TEMPLATES = [{
+                    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                    'DIRS': [],
+                    'APP_DIRS': True,
+                    'OPTIONS': {
+                        'context_processors': [...],
+                        'loaders': [
+                            ('django.template.loaders.cached.Loader', [
+                                'django.template.loaders.filesystem.Loader',
+                                'django.template.loaders.app_directories.Loader',
+                            ]),
+                        ],
+                    },
+                }]
+```
+    """
+
+    [install.use_celery]
+    ask.en = "Activate celery broker"
+    ask.fr = "Activer le broker celery"
+    type = "boolean"
+    default = false
+    help = """Add celery support to the app configuration file :
+```
+        # settings.py
+        INSTALLED_APPS += [
+        ...............OTHERS...............
+            'django_celery_results',
+            'django_celery_beat',
+        ]
+
+        # Celery Configuration
+        CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
+        CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
+        CELERY_ACCEPT_CONTENT = ['application/json']
+        CELERY_TASK_SERIALIZER = 'json'
+        CELERY_RESULT_SERIALIZER = 'json'
+        CELERY_TIMEZONE = 'UTC'
+        CELERY_TASK_TRACK_STARTED = True
+        CELERY_TASK_TIME_LIMIT = 30 * 60
+        CELERY_RESULT_EXPIRES = 3600
+        CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+```
+        """
+
+
+
 [resources]
     [resources.sources]
 
@@ -63,11 +167,14 @@ ram.runtime = "50M"
 
     [resources.permissions]
     main.url = "/"
+    flower.url = "/flower"
+    flower.allowed = "admins"
+    flower.show_tile = true 
 
     [resources.ports]
 
     [resources.apt]
-    packages = "postgresql postgresql-contrib"
+    packages = "postgresql, postgresql-contrib, libpq-dev, python3-pip, python3-venv, python3-dev, redis-server"
 
     [resources.database]
     type = "postgresql"
