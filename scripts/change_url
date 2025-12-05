@@ -14,7 +14,7 @@ ynh_script_progression "Stopping $app's systemd service..."
 
 ynh_systemctl --service="$app-gunicorn" --action="stop"
 
-if use_celery
+if use_celery; then
     ynh_systemctl --service="$app-celery" --action="stop"
     ynh_systemctl --service="$app-celery-beat" --action="stop"
     ynh_systemctl --service="$app-flower" --action="stop"
@@ -31,11 +31,11 @@ ynh_config_change_url_nginx
 # SPECIFIC MODIFICATIONS
 #=================================================
 
-if db_engine = "postgresql"
+if db_engine = "postgresql"; then
 ynh_config_add --template=".env" --destination="$install_dir/.env"
 fi
 
-if db_engine = "sqlite3"
+if db_engine = "sqlite3"; then
 ynh_config_add --template=".env" --destination="$install_dir/.env.sqlite"
 fi
 
@@ -49,7 +49,7 @@ ynh_script_progression "Starting $app's systemd service..."
 
 ynh_systemctl --service="$app-gunicorn" --action="start"
 
-if use_celery
+if use_celery; then
     ynh_systemctl --service="$app-celery" --action="start"
     ynh_systemctl --service="$app-celery-beat" --action="start"
     ynh_systemctl --service="$app-flower" --action="start"

@@ -31,10 +31,12 @@ ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 # Backup the systemd service units
 ynh_backup "/etc/systemd/system/$app-gunicorn.service"
-ynh_backup "/etc/systemd/system/$app-celery.service"
-ynh_backup "/etc/systemd/system/$app-celery-beat.service"
-ynh_backup "/etc/systemd/system/$app-flower.service"
 
+if use_celery; then
+    ynh_backup "/etc/systemd/system/$app-celery.service"
+    ynh_backup "/etc/systemd/system/$app-celery-beat.service"
+    ynh_backup "/etc/systemd/system/$app-flower.service"
+fi
 
 # Backup the logrotate configuration
 ynh_backup "/etc/logrotate.d/$app"
@@ -54,10 +56,7 @@ ynh_backup "/var/log/$app/"
 #=================================================
 ynh_print_info "Backing up the MySQL database..."
 
-### (However, things like MySQL dumps *do* take some time to run, though the
-### copy of the generated dump to the archive still happens later)
-
-ynh_mysql_dump_db > db.sql
+ynh_psql_dump_db > db.sql
 
 #=================================================
 # END OF SCRIPT

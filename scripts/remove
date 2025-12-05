@@ -19,7 +19,7 @@ ynh_config_remove_logrotate
 yunohost service remove "$app-gunicorn"
 ynh_config_remove_systemd "$app-gunicorn"
 
-if use_celery
+if use_celery; then
     yunohost service remove "$app-celery"
     yunohost service remove "$app-celery-beat"
     yunohost service remove "$app-flower"
