@@ -174,7 +174,7 @@ ram.runtime = "50M"
     main.url = "/"
     flower.url = "/flower"
     flower.allowed = "admins"
-    flower.show_tile = true 
+    flower.show_tile = true
 
     [resources.ports]
 
