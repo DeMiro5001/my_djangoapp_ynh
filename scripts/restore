@@ -42,20 +42,20 @@ ynh_restore "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 ynh_restore "/etc/systemd/system/$app-gunicorn.service"
 systemctl enable "$app-gunicorn.service" --quiet
-yunohost service add "$app-gunicorn" ---description="Gunicorn for $app" --log="/var/log/$app/$app-gunicorn.log"
+yunohost service add "$app-gunicorn" --description="Gunicorn for $app" --log="/var/log/$app/$app-gunicorn.log"
 
 if use_celery; then
     ynh_restore "/etc/systemd/system/$app-celery.service"
     systemctl enable "$app-celery.service" --quiet
-    yunohost service add "$app-celery" ---description="Celery for $app" --log="/var/log/$app/$app-celery.log"
+    yunohost service add "$app-celery" --description="Celery for $app" --log="/var/log/$app/$app-celery.log"
 
     ynh_restore "/etc/systemd/system/$app-celery-beat.service"
     systemctl enable "$app-celery-beat.service" --quiet
-    yunohost service add "$app-celery-beat" ---description="Celery beat for $app" --log="/var/log/$app/$app-celery-beat.log"
+    yunohost service add "$app-celery-beat" --description="Celery beat for $app" --log="/var/log/$app/$app-celery-beat.log"
 
     ynh_restore "/etc/systemd/system/$app-flower.service"
     systemctl enable "$app-flower.service" --quiet
-    yunohost service add "$app-flower" ---description="Flower for $app" --log="/var/log/$app/$app-flower.log"
+    yunohost service add "$app-flower" --description="Flower for $app" --log="/var/log/$app/$app-flower.log"
 fi
 
 ynh_restore "/etc/logrotate.d/$app"
