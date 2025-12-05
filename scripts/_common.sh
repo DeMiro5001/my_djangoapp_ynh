@@ -73,7 +73,8 @@ extract_project() {
     fi
     
     echo "Extracting project ($src_format) to: $install_dir"
-
+    project="$temp_file"
+    
     # Extract based on format (like ynh_setup_source but simplified)
     case "$src_format" in
         "zip")
