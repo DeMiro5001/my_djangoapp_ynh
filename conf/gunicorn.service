@@ -1,0 +1,21 @@
+[Unit]
+Description=gunicorn daemon for __APP__
+After=network.target postgresql.service redis-server.service
+
+[Service]
+User=__APP__
+Group=__APP__
+WorkingDirectory=__INSTALL_DIR__
+Environment="PATH=__INSTALL_DIR__/venv/bin"
+Environment="DJANGO_SETTINGS_MODULE=__APP__.settings"
+EnvironmentFile=__INSTALL_DIR__/.env
+ExecStart=__INSTALL_DIR__/venv/bin/gunicorn \
+    --access-logfile - \
+    --workers 3 \
+    --worker-class gevent \
+    --worker-connections 1000 \
+    --bind unix:/__INSTALL_DIR__/gunicorn.sock \
+    __APP__.wsgi:application
+
+[Install]
+WantedBy=multi-user.target

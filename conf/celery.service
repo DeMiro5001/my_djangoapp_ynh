@@ -1,0 +1,31 @@
+[Unit]
+Description=Celery Worker for __APP__
+After=network.target redis-server.service postgresql.service
+
+[Service]
+Type=simple
+User=__APP__
+Group=__APP__
+WorkingDirectory=__INSTALL_DIR__
+Environment="PATH=__INSTALL_DIR__/venv/bin"
+EnvironmentFile=__INSTALL_DIR__/.env
+ExecStart=__INSTALL_DIR__/venv/bin/celery \
+    -A __APP__ worker \
+    --loglevel=INFO \
+    --concurrency=4 \
+    --max-tasks-per-child=1000 \
+    --max-memory-per-child=250000
+
+StandardOutput=append:/var/log/__APP__/celery-worker.log
+StandardError=append:/var/log/__APP__/celery-worker.error.log
+
+Restart=always
+RestartSec=10s
+
+# Hardening
+PrivateTmp=true
+ProtectSystem=full
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

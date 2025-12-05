@@ -35,6 +35,11 @@ ram.runtime = "50M"
     type = "group"
     default = "visitors"
 
+    [install.project]
+    ask.en = "Locate your django project archive : either local or remote (zip or tar.gz)"
+    ask.fr = "Localisez votre archive de projet django : local ou distante (zip ou tar.gz)"
+    type = "text"
+
     [install.language]
     ask.en = "Choose the application language"
     ask.fr = "Choisissez la langue de l'application"
@@ -56,7 +61,7 @@ ram.runtime = "50M"
     type = "select"
     choices = ["sqlite3", "postgresql" ]
     default = "postgresql"
-    help = """Add this to the app configuration file :
+    help = """Add this DB block to the app configuration file :
 ```
                 # settings.py
                 DB_ENGINE = env('DB_ENGINE', default='sqlite3')
@@ -152,14 +157,14 @@ ram.runtime = "50M"
 ```
         """
 
-
-
 [resources]
     [resources.sources]
 
     [resources.sources.main]
 
     [resources.system_user]
+    allow_email = true
+    mail_user = 'noreply'
 
     [resources.install_dir]
 

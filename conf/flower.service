@@ -1,0 +1,25 @@
+[Unit]
+Description=Celery Flower Monitoring for __APP__
+After=network.target redis-server.service
+Wants=celery.service
+
+[Service]
+User=__APP__
+Group=__APP__
+Type=simple
+WorkingDirectory=__INSTALL_DIR__
+Environment="PATH=__INSTALL_DIR__/venv/bin"
+EnvironmentFile=__INSTALL_DIR__/.env
+ExecStart=__INSTALL_DIR__/venv/bin/celery \
+    -A __APP__ flower \
+    --port=__FLOWER_PORT__ \
+    --broker=__CELERY_BROKER_URL__ \
+    --broker_api=__CELERY_BROKER_URL__ \
+    --loglevel=info \
+    --basic_auth=__ADMIN__:__PASSWORD__
+
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
