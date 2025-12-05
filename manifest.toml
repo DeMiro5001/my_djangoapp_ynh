@@ -92,7 +92,7 @@ ram.runtime = "50M"
     ask.en = "Activate redis server"
     ask.fr = "Activer le serveur redis"
     type = "boolean"
-    default = false
+    default = true
     help = """Add redis support to the app configuration file :
 ```
                 # settings.py
