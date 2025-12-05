@@ -158,9 +158,6 @@ ram.runtime = "50M"
         """
 
 [resources]
-    [resources.sources]
-
-    [resources.sources.main]
 
     [resources.system_user]
     allow_email = true
