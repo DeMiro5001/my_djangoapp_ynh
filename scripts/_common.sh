@@ -45,7 +45,6 @@ extract_project() {
             return 1
         fi
         
-        project="$temp_file"
     fi
     
     # Check if local file exists (just in case)
