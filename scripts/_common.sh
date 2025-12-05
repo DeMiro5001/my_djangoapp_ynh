@@ -25,23 +25,15 @@ redis_unlock() {
 # Function to handle project source (local or remote, zip or tar.gz)
 ############################################
 
-_extract_cleanup() {
-    # Clean up temporary file if it exists
-    [ -n "$1" ] && rm -f "$1"
-}
-
 extract_project() {
     local project="$1"
-    local temp_file=""
     
     # Check if it's a URL or local file
     if [[ "$project" =~ ^https?:// ]]; then
         # It's a URL - download it
         echo "Downloading project from URL: $project"
-        temp_file=$(mktemp)
-        if ! wget --tries 3 --timeout 900 --no-verbose --output-document="$temp_file" "$project" 2>&1; then
+        if ! wget --tries 3 --timeout 900 --no-verbose "$project" 2>&1; then
             echo "Error: Failed to download from URL: $project"
-            _extract_cleanup "$temp_file"
             return 1
         fi
         
@@ -50,37 +42,36 @@ extract_project() {
     # Check if local file exists (just in case)
     if [ ! -f "$project" ]; then
         echo "Error: File not found: $project"
-        _extract_cleanup "$temp_file"
         return 1
     fi
-    
+
+    filename=$(basename -- "$project")
+    cp "$project" "$filename"
+
     # Determine file type (like ynh_setup_source logic)
     local src_format=""
-    if [[ "$project" =~ \.zip$ ]]; then
+    if [[ "$filename" =~ \.zip$ ]]; then
         src_format="zip"
-    elif [[ "$project" =~ \.tar\.gz$ ]] || [[ "$project" =~ \.tgz$ ]]; then
+    elif [[ "$filename" =~ \.tar\.gz$ ]] || [[ "$project" =~ \.tgz$ ]]; then
         src_format="tar.gz"
-    elif [[ "$project" =~ \.tar\.xz$ ]]; then
+    elif [[ "$filename" =~ \.tar\.xz$ ]]; then
         src_format="tar.xz"
-    elif [[ "$project" =~ \.tar\.bz2$ ]]; then
+    elif [[ "$filename" =~ \.tar\.bz2$ ]]; then
         src_format="tar.bz2"
-    elif [[ "$project" =~ \.tar$ ]]; then
+    elif [[ "$filename" =~ \.tar$ ]]; then
         src_format="tar"
     else
         echo "Error: Unsupported archive format. Supported: .zip, .tar.gz, .tgz, .tar.xz, .tar.bz2, .tar"
-        _extract_cleanup "$temp_file"
         return 1
     fi
     
     echo "Extracting project ($src_format) to: $install_dir"
-    project="$temp_file"
     
     # Extract based on format (like ynh_setup_source but simplified)
     case "$src_format" in
         "zip")
-            if ! unzip -q "$project" -d "$install_dir"; then
+            if ! unzip -q "$filename" -d "$install_dir"; then
                 echo "Error: Failed to extract zip file"
-                _extract_cleanup "$temp_file"
                 return 1
             fi
             ;;
@@ -93,22 +84,17 @@ extract_project() {
                 "tar") tar_cmd="tar";;
             esac
             
-            if ! $tar_cmd -xf "$project" -C "$install_dir"; then
+            if ! $tar_cmd -xf "$filename" -C "$install_dir"; then
                 echo "Error: Failed to extract $src_format file"
-                _extract_cleanup "$temp_file"
                 return 1
             fi
             ;;
         *)
             echo "Error: Unsupported format: $src_format"
-            _extract_cleanup "$temp_file"
             return 1
             ;;
     esac
-    
-    # Check if there's exactly one directory and no files in the root (case where archive has a subfolder)
-    pushd "$install_dir"
-    
+
     # Count items in current directory, if there's exactly one directory and no files, move contents up
     local items=(*)
     local dirs=()
@@ -129,11 +115,6 @@ extract_project() {
         
         rmdir "${dirs[0]}" 2>/dev/null || true
     fi
-    
-    popd
-    
-    # Clean up temporary file
-    _extract_cleanup "$temp_file"
     
     echo "Project extracted successfully to: $install_dir"
 }
