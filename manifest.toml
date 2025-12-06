@@ -59,8 +59,8 @@ ram.runtime = "50M"
     ask.en = "What database engine do you want to use ?"
     ask.fr = "Quelle base de données voulez-vous utiliser ?"
     type = "select"
-    choices = ["sqlite3", "postgresql" ]
-    default = "postgresql"
+    choices = ["sqlite", "postgresql"]
+    default = "sqlite"
     help = """Add this DB block to the app configuration file :
 ```
                 # settings.py
