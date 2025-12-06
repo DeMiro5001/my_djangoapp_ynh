@@ -5,7 +5,7 @@ test_format = 1.0
 [default]
 
     args.project = "https://github.com/DeMiro5001/linkdir/archive/refs/tags/v1.1.0.tar.gz"
-    args.db_engine = "sqlite3"
+    args.db_engine = "sqlite"
     # args.multisite = 0
 
 ## This is an additional test suite
