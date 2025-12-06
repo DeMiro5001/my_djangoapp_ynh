@@ -95,6 +95,8 @@ extract_project() {
             ;;
     esac
 
+    ynh_safe_rm $filename
+    
     # Count items in current directory, if there's exactly one directory and no files, move contents up
     local items=(*)
     local dirs=()
