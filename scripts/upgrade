@@ -34,6 +34,18 @@ ynh_script_progression "Upgrading source files..."
 
 pushd $install_dir
     extract_project $project
+
+if $db_engine = "postgresql"; then
+ynh_config_add --template=".env" --destination="$install_dir/.env"
+fi
+
+if $db_engine = "sqlite"; then
+ynh_config_add --template=".env.sqlite" --destination="$install_dir/.env"
+fi
+
+chmod 400 "$install_dir/.env"
+chown "$app:$app" "$install_dir/.env"
+ 
     source venv/bin/activate
     pip install --upgrade -r requirements.txt
     python manage.py migrate
@@ -42,23 +54,6 @@ pushd $install_dir
 popd
 
 chown -R "$app:$app" "$install_dir"
-
-#=================================================
-# UPDATE A CONFIG FILE
-#=================================================
-ynh_script_progression "Updating $app's configuration files..."
-
-
-if $db_engine = "postgresql"; then
-ynh_config_add --template=".env" --destination="$install_dir/.env"
-fi
-
-if $db_engine = "sqlite3"; then
-ynh_config_add --template=".env.sqlite" --destination="$install_dir/.env"
-fi
-
-chmod 400 "$install_dir/.env"
-chown "$app:$app" "$install_dir/.env"
 
 #=================================================
 # REAPPLY SYSTEM CONFIGURATION
