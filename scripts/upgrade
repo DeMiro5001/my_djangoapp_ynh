@@ -35,12 +35,12 @@ ynh_script_progression "Upgrading source files..."
 pushd $install_dir
     extract_project $project
 
-if $db_engine = "postgresql"; then
+if [ "$db_engine" = "postgresql" ]; then
 ynh_config_add --template=".env" --destination="$install_dir/.env"
 fi
 
-if $db_engine = "sqlite"; then
-ynh_config_add --template=".env.sqlite" --destination="$install_dir/.env"
+if [ "$db_engine" = "sqlite" ]; then
+ynh_config_add --template=".env" --destination="$install_dir/.env.sqlite"
 fi
 
 chmod 400 "$install_dir/.env"
