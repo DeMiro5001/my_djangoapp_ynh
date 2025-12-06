@@ -39,9 +39,8 @@ redis_unlock "celery_broker_db"
 #=================================================
 ynh_script_progression "Setting up source files..."
 
-extract_project $project
-
 pushd $install_dir
+    extract_project $project
     python -m venv venv
     source venv/bin/activate
     pip install -r requirements.txt

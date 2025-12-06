@@ -32,9 +32,8 @@ fi
 #=================================================
 ynh_script_progression "Upgrading source files..."
 
-extract_project $project
-
 pushd $install_dir
+    extract_project $project
     source venv/bin/activate
     pip install --upgrade -r requirements.txt
     python manage.py migrate
