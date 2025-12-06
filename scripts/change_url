@@ -31,11 +31,11 @@ ynh_config_change_url_nginx
 # SPECIFIC MODIFICATIONS
 #=================================================
 
-if db_engine = "postgresql"; then
+if $db_engine = "postgresql"; then
 ynh_config_add --template=".env" --destination="$install_dir/.env"
 fi
 
-if db_engine = "sqlite3"; then
+if $db_engine = "sqlite3"; then
 ynh_config_add --template=".env" --destination="$install_dir/.env.sqlite"
 fi
 

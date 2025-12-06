@@ -43,11 +43,11 @@ pushd $install_dir
     extract_project $project
 
     # .env
-    if db_engine = "postgresql"; then
+    if $db_engine = "postgresql"; then
     ynh_config_add --template=".env" --destination="$install_dir/.env"
     fi
 
-    if db_engine = "sqlite3"; then
+    if $db_engine = "sqlite3"; then
     ynh_config_add --template=".env.sqlite" --destination="$install_dir/.env"
     fi
 
