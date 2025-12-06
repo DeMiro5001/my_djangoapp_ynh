@@ -41,6 +41,19 @@ ynh_script_progression "Setting up source files..."
 
 pushd $install_dir
     extract_project $project
+
+    # .env
+    if db_engine = "postgresql"; then
+    ynh_config_add --template=".env" --destination="$install_dir/.env"
+    fi
+
+    if db_engine = "sqlite3"; then
+    ynh_config_add --template=".env.sqlite" --destination="$install_dir/.env"
+    fi
+
+    chmod 400 "$install_dir/.env"
+    chown "$app:$app" "$install_dir/.env"
+
     python -m venv venv
     source venv/bin/activate
     pip install -r requirements.txt
@@ -51,23 +64,6 @@ pushd $install_dir
 popd
 
 chown -R "$app:$app" "$install_dir"
-
-#=================================================
-# APP INITIAL CONFIGURATION
-#=================================================
-ynh_script_progression "Adding $app's configuration files..."
-
-
-if db_engine = "postgresql"; then
-ynh_config_add --template=".env" --destination="$install_dir/.env"
-fi
-
-if db_engine = "sqlite3"; then
-ynh_config_add --template=".env.sqlite" --destination="$install_dir/.env"
-fi
-
-chmod 400 "$install_dir/.env"
-chown "$app:$app" "$install_dir/.env"
 
 #=================================================
 # SYSTEM CONFIGURATION
