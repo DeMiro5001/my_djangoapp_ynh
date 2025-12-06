@@ -47,7 +47,7 @@ pushd $install_dir
     ynh_config_add --template=".env" --destination="$install_dir/.env"
     fi
 
-    if $db_engine = "sqlite3"; then
+    if $db_engine = "sqlite"; then
     ynh_config_add --template=".env.sqlite" --destination="$install_dir/.env"
     fi
 
