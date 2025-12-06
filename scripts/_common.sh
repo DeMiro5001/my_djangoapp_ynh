@@ -28,6 +28,16 @@ redis_unlock() {
 extract_project() {
     local project="$1"
     
+    filename=$(basename -- "$project")
+
+    # Check if local file exists (just in case)
+    if [[ -f  "$project" ]]; then
+        echo "Cpoying $project to $install_dir"
+        cp $project $filename
+    else
+        echo "$project is not a local file"
+    fi
+
     # Check if it's a URL or local file
     if [[ "$project" =~ ^https?:// ]]; then
         # It's a URL - download it
@@ -36,17 +46,7 @@ extract_project() {
             echo "Error: Failed to download from URL: $project"
             return 1
         fi
-        
     fi
-    
-    # Check if local file exists (just in case)
-    if [ ! -f "$project" ]; then
-        echo "Error: File not found: $project"
-        return 1
-    fi
-
-    filename=$(basename -- "$project")
-    cp "$project" "$filename"
 
     # Determine file type (like ynh_setup_source logic)
     local src_format=""
