@@ -53,7 +53,7 @@ chown "$app:$app" "$install_dir/.env"
     deactivate
 popd
 
-chown -R "$app:$app" "$install_dir"
+chown -R "$app:www-data" "$install_dir"
 
 #=================================================
 # REAPPLY SYSTEM CONFIGURATION
