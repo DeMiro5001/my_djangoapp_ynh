@@ -76,7 +76,7 @@ ynh_restore "/var/log/$app/"
 ynh_script_progression "Reloading NGINX web server and $app's service..."
 
 
-ynh_systemctl ---service="$app-gunicorn" --action="start"
+ynh_systemctl --service="$app-gunicorn" --action="start"
 
 if [ "use_celery" == "true" ]; then
     ynh_systemctl --service="$app-celery" --action="start"
