@@ -77,7 +77,7 @@ ynh_config_add_nginx
 ynh_config_add_systemd --service="$app-gunicorn" --template="gunicorn.service"
 yunohost service add "$app-gunicorn" --description="Gunicorn for $app" --log="/var/log/$app/$app-gunicorn.log"
 
-if [ "use_celery" ]; then
+if [ "use_celery" == "true" ]; then
     ynh_config_add_systemd --service="$app-celery" --template="celery.service"
     ynh_config_add_systemd --service="$app-celery-beat" --template="celery-beat.service"
     ynh_config_add_systemd --service="$app-flower" --template="flower.service"
@@ -97,7 +97,7 @@ ynh_script_progression "Starting $app's systemd service..."
 
 ynh_systemctl --service="$app-gunicorn" --action="start"
 
-if [ "use_celery" ]; then
+if [ "use_celery" == "true" ]; then
     ynh_systemctl --service="$app-celery" --action="start"
     ynh_systemctl --service="$app-celery-beat" --action="start"
     ynh_systemctl --service="$app-flower" --action="start"
