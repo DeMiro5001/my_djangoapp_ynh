@@ -66,6 +66,8 @@ pushd $install_dir
 popd
 
 chown -R "$app:$app" "$install_dir"
+mkdir -p /var/log/$app
+chown -R "$app:$app" "/var/log/$app"
 
 #=================================================
 # SYSTEM CONFIGURATION
