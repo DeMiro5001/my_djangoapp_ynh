@@ -10,9 +10,10 @@ source /usr/share/yunohost/helpers
 secret_key=$(ynh_app_setting_get --app=$app --key=secret_key)
 admin_mail=$(ynh_app_setting_get --app=$app --key=admin_mail)
 timezone=$(ynh_app_setting_get --app=$app --key=timezone)
-redis_db=$(ynh_app_setting_get --app=$app --key=secret_key)
-celery_broker_db=$(ynh_app_setting_get --app=$app --key=secret_key)
-celery_result_db=$(ynh_app_setting_get --app=$app --key=secret_key)
+redis_db=$(ynh_app_setting_get --app=$app --key=redis_db)
+celery_broker_db=$(ynh_app_setting_get --app=$app --key=celery_broker_db)
+celery_result_db=$(ynh_app_setting_get --app=$app --key=celery_result_db)
+project_name=$(ynh_app_setting_get --app=$app --key=project_name)
 
 #=================================================
 # STOP SYSTEMD SERVICE

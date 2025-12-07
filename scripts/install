@@ -58,6 +58,7 @@ pushd $install_dir
 
     python -m venv venv
     source venv/bin/activate
+    pip install --upgrade pip wheel setuptools
     pip install -r requirements.txt
     pip install gunicorn gevent
     python manage.py migrate
@@ -65,6 +66,7 @@ pushd $install_dir
     DJANGO_SUPERUSER_USERNAME=$admin DJANGO_SUPERUSER_EMAIL=$admin_mail DJANGO_SUPERUSER_PASSWORD=$password python manage.py createsuperuser --noinput
     # Get project name
     project_name=$(grep 'DJANGO_SETTINGS_MODULE' $install_dir/manage.py | sed -E "s/.*['\"]([^'\"]+)\.settings.*/\1/")
+    ynh_app_setting_set --app=$app --key=project_name --value=$project_name
     deactivate
 popd
 
