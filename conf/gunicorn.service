@@ -14,7 +14,7 @@ ExecStart=__INSTALL_DIR__/venv/bin/gunicorn \
     --workers 3 \
     --worker-class gevent \
     --worker-connections 1000 \
-    --bind unix:/__INSTALL_DIR__/gunicorn.sock \
+    --bind unix://__INSTALL_DIR__/gunicorn.sock \
     __APP__.wsgi:application
 
 [Install]
