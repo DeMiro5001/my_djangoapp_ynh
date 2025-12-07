@@ -29,7 +29,7 @@ chown -R "$app:$app" "$data_dir"
 #=================================================
 ynh_script_progression "Restoring the Podstgresql database..."
 
-if $db_engine = "postgresql"; then
+if [ "$db_engine" = "postgresql" ]; then
 ynh_psql_db_shell < ./db.sql
 fi
 

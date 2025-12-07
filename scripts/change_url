@@ -31,6 +31,8 @@ ynh_config_change_url_nginx
 # SPECIFIC MODIFICATIONS
 #=================================================
 
+mail_user="noreply" 
+
 if [ "$db_engine" = "postgresql" ]; then
 ynh_config_add --template=".env" --destination="$install_dir/.env"
 fi
