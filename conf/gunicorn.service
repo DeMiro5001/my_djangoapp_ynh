@@ -7,7 +7,7 @@ User=__APP__
 Group=__APP__
 WorkingDirectory=__INSTALL_DIR__
 Environment="PATH=__INSTALL_DIR__/venv/bin"
-Environment="DJANGO_SETTINGS_MODULE=__APP__.settings"
+Environment="DJANGO_SETTINGS_MODULE=__PROJECT_NAME__.wsgi:application"
 EnvironmentFile=__INSTALL_DIR__/.env
 ExecStart=__INSTALL_DIR__/venv/bin/gunicorn \
     --access-logfile - \
@@ -15,7 +15,7 @@ ExecStart=__INSTALL_DIR__/venv/bin/gunicorn \
     --worker-class gevent \
     --worker-connections 1000 \
     --bind unix://__INSTALL_DIR__/gunicorn.sock \
-    __APP__.wsgi:application
+    __PROJECT_NAME__.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
