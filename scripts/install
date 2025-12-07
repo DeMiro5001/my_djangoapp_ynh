@@ -63,6 +63,8 @@ pushd $install_dir
     python manage.py migrate
     python manage.py collectstatic --noinput
     DJANGO_SUPERUSER_USERNAME=$admin DJANGO_SUPERUSER_EMAIL=$admin_mail DJANGO_SUPERUSER_PASSWORD=$password python manage.py createsuperuser --noinput
+    # Get project name
+    project_name=$(grep 'DJANGO_SETTINGS_MODULE' $install_dir/manage.py | sed -E "s/.*['\"]([^'\"]+)\.settings.*/\1/")
     deactivate
 popd
 
