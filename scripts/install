@@ -68,9 +68,9 @@ pushd $install_dir
     deactivate
 popd
 
-chown -R "$app:$app" "$install_dir"
+chown -R "$app:www-data" "$install_dir"
 mkdir -p /var/log/$app
-chown -R "$app:$app" "/var/log/$app"
+chown -R "$app:www-data" "/var/log/$app"
 
 #=================================================
 # SYSTEM CONFIGURATION
