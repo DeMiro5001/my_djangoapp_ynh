@@ -58,6 +58,11 @@ pushd $install_dir
 
     python -m venv venv
     source venv/bin/activate
+
+    if [ "$db_engine" = "postgresql" ]; then
+    pip install psycopg
+    fi
+
     pip install --upgrade pip wheel setuptools
     pip install -r requirements.txt
     pip install gunicorn gevent
