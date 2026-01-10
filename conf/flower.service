@@ -16,6 +16,7 @@ ExecStart=__INSTALL_DIR__/venv/bin/celery \
     --broker=__CELERY_BROKER_URL__ \
     --broker_api=__CELERY_BROKER_URL__ \
     --loglevel=info \
+    --url_prefix=flower \
     --basic_auth=__ADMIN__:__PASSWORD__
 
 Restart=always
