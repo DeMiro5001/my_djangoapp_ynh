@@ -34,6 +34,8 @@ ynh_app_setting_set --app=$app --key=celery_result_db --value=$celery_result_db
 redis_unlock "redis_db"
 redis_unlock "celery_broker_db"
 
+celery_broker_url=redis://localhost:6379/$celery_broker_db
+
 mail_user="noreply" 
 
 #=================================================
