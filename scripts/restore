@@ -44,7 +44,7 @@ ynh_restore "/etc/systemd/system/$app-gunicorn.service"
 systemctl enable "$app-gunicorn.service" --quiet
 yunohost service add "$app-gunicorn" --description="Gunicorn for $app" --log="/var/log/$app/$app-gunicorn.log"
 
-if [ "use_celery" == "true" ]; then
+if [ "$use_celery" == "true" ]; then
     ynh_restore "/etc/systemd/system/$app-celery.service"
     systemctl enable "$app-celery.service" --quiet
     yunohost service add "$app-celery" --description="Celery for $app" --log="/var/log/$app/$app-celery.log"
