@@ -12,7 +12,7 @@ Environment="PATH=__INSTALL_DIR__/venv/bin"
 EnvironmentFile=__INSTALL_DIR__/.env
 ExecStart=__INSTALL_DIR__/venv/bin/celery \
     -A __APP__ flower \
-    --port=__FLOWER_PORT__ \
+    --port=__PORT_FLOWER__ \
     --broker=__CELERY_BROKER_URL__ \
     --broker_api=__CELERY_BROKER_URL__ \
     --loglevel=info \
