@@ -11,7 +11,7 @@ WorkingDirectory=__INSTALL_DIR__
 Environment="PATH=__INSTALL_DIR__/venv/bin"
 EnvironmentFile=__INSTALL_DIR__/.env
 ExecStart=__INSTALL_DIR__/venv/bin/celery \
-    -A __APP__ flower \
+    -A __PROJECT_NAME__ flower \
     --port=__PORT_FLOWER__ \
     --broker=__CELERY_BROKER_URL__ \
     --broker_api=__CELERY_BROKER_URL__ \
