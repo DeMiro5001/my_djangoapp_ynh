@@ -44,13 +44,18 @@ ynh_script_progression "Setting up source files..."
 pushd $install_dir
     extract_project $project
 
-    # .env
-    if [ "$db_engine" = "postgresql" ]; then
-    ynh_config_add --template=".env" --destination="$install_dir/.env"
-    fi
-
-    if [ "$db_engine" = "sqlite" ]; then
-    ynh_config_add --template=".env.sqlite" --destination="$install_dir/.env"
+    # Check if .env.example exists in the installation directory and use it instead of the ones provided in the package, FIXME : add the corresponding documentation
+    if [ -f "$install_dir/.env.example" ]; then
+        ynh_config_add --template="$install_dir/.env.example" --destination="$install_dir/.env"
+    else
+        
+        if [ "$db_engine" = "postgresql" ]; then
+            ynh_config_add --template=".env" --destination="$install_dir/.env"
+        
+        elif [ "$db_engine" = "sqlite" ]; then
+            ynh_config_add --template=".env.sqlite" --destination="$install_dir/.env"
+        fi
+    
     fi
 
     chmod 400 "$install_dir/.env"
