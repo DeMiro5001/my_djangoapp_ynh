@@ -32,7 +32,7 @@ ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf"
 # Backup the systemd service units
 ynh_backup "/etc/systemd/system/$app-gunicorn.service"
 
-if [ "$use_celery" == "true" ]; then
+if [ "$use_celery" -eq 1 ]; then
     ynh_backup "/etc/systemd/system/$app-celery.service"
     ynh_backup "/etc/systemd/system/$app-celery-beat.service"
     ynh_backup "/etc/systemd/system/$app-flower.service"
