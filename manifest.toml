@@ -166,6 +166,8 @@ ram.runtime = "50M"
     [resources.install_dir]
 
     [resources.data_dir]
+    subdirs = ["media"]
+    group = "www-data:rx"
 
     [resources.permissions]
     main.url = "/"
