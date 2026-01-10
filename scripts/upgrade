@@ -23,7 +23,7 @@ ynh_script_progression "Stopping $app's systemd service..."
 
 ynh_systemctl --service="$app-gunicorn" --action="stop"
 
-if [ "use_celery" == "true" ]; then
+if [ "$use_celery" == "true" ]; then
     ynh_systemctl --service="$app-celery" --action="stop"
     ynh_systemctl --service="$app-celery-beat" --action="stop"
     ynh_systemctl --service="$app-flower" --action="stop"
@@ -37,13 +37,18 @@ ynh_script_progression "Upgrading source files..."
 pushd $install_dir
     extract_project $project
 
-if [ "$db_engine" = "postgresql" ]; then
-ynh_config_add --template=".env" --destination="$install_dir/.env"
-fi
-
-if [ "$db_engine" = "sqlite" ]; then
-ynh_config_add --template=".env" --destination="$install_dir/.env.sqlite"
-fi
+    if [ -f "$install_dir/.env.example" ]; then
+        ynh_config_add --template="$install_dir/.env.example" --destination="$install_dir/.env"
+    else
+        
+        if [ "$db_engine" = "postgresql" ]; then
+            ynh_config_add --template=".env" --destination="$install_dir/.env"
+        
+        elif [ "$db_engine" = "sqlite" ]; then
+            ynh_config_add --template=".env.sqlite" --destination="$install_dir/.env"
+        fi
+    
+    fi
 
 chmod 400 "$install_dir/.env"
 chown "$app:$app" "$install_dir/.env"
@@ -67,7 +72,7 @@ ynh_config_add_nginx
 ynh_config_add_systemd --service="$app-gunicorn" --template="gunicorn.service"
 yunohost service add "$app-gunicorn" --description="Gunicorn for $app" --log="/var/log/$app/$app-gunicorn.log"
 
-if [ "use_celery" == "true" ]; then
+if [ "$use_celery" == "true" ]; then
     ynh_config_add_systemd --service="$app-celery" --template="celery.service"
     ynh_config_add_systemd --service="$app-celery-beat" --template="celery-beat.service"
     ynh_config_add_systemd --service="$app-flower" --template="flower.service"
@@ -87,7 +92,7 @@ ynh_script_progression "Starting $app's systemd service..."
 
 ynh_systemctl --service="$app-gunicorn" --action="start"
 
-if [ "use_celery" == "true" ]; then
+if [ "$use_celery" == "true" ]; then
     ynh_systemctl --service="$app-celery" --action="start"
     ynh_systemctl --service="$app-celery-beat" --action="start"
     ynh_systemctl --service="$app-flower" --action="start"
