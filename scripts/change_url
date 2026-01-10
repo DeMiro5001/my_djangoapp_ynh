@@ -14,7 +14,7 @@ ynh_script_progression "Stopping $app's systemd service..."
 
 ynh_systemctl --service="$app-gunicorn" --action="stop"
 
-if [ "$use_celery" == "true" ]; then
+if [ "$use_celery" -eq 1 ]; then
     ynh_systemctl --service="$app-celery" --action="stop"
     ynh_systemctl --service="$app-celery-beat" --action="stop"
     ynh_systemctl --service="$app-flower" --action="stop"
@@ -56,7 +56,7 @@ ynh_script_progression "Starting $app's systemd service..."
 
 ynh_systemctl --service="$app-gunicorn" --action="start"
 
-if [ "use_celery" == "true" ]; then
+if [ "$use_celery" -eq 1 ]; then
     ynh_systemctl --service="$app-celery" --action="start"
     ynh_systemctl --service="$app-celery-beat" --action="start"
     ynh_systemctl --service="$app-flower" --action="start"
