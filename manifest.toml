@@ -56,7 +56,7 @@ ram.runtime = "50M"
     type = "password"
 
     [install.db_engine]
-    ask.en = "What database engine do you want to use ?"
+    ask.en = "What database engine do you want to use ? (if you have a .env.example at the root of the project, this will be used"
     ask.fr = "Quelle base de données voulez-vous utiliser ?"
     type = "select"
     choices = ["sqlite", "postgresql"]
