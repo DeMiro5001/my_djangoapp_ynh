@@ -31,8 +31,6 @@ ynh_config_change_url_nginx
 # SPECIFIC MODIFICATIONS
 #=================================================
 
-mail_user="noreply" 
-
     if [ -f "$install_dir/.env.example" ]; then
         ynh_config_add --template="$install_dir/.env.example" --destination="$install_dir/.env"
     else
