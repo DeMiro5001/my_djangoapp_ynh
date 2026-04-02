@@ -55,6 +55,15 @@ ram.runtime = "50M"
     help.fr = "Utilisez le champ aide pour ajouter une information à l'intention de l'administrateur à propos de cette question."
     type = "password"
 
+    
+    [install.mail_user]
+    ask.en = "Choose the application mail system"
+    ask.fr = "Choisissez l'email système de l'application"
+    type = "select"
+    choices.noreply="noreply@"
+    choices.contact="contact@"
+    default = "noreply"
+
     [install.db_engine]
     ask.en = "What database engine do you want to use ? (if you have a .env.example at the root of the project, it will be used and this setting will be ignored)"
     ask.fr = "Quelle base de données voulez-vous utiliser ?"
