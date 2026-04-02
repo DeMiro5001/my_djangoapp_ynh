@@ -22,17 +22,17 @@ ynh_app_setting_set --key=timezone --value=$timezone
 
 redis_db=$(ynh_redis_get_free_db)
 ynh_app_setting_set --app=$app --key=redis_db --value=$redis_db
-redis_lock "redis_db" 
+redis_lock $redis_db
 
 celery_broker_db=$(ynh_redis_get_free_db)
 ynh_app_setting_set --app=$app --key=celery_broker_db --value=$celery_broker_db
-redis_lock "celery_broker_db"
+redis_lock $celery_broker_db
 
 celery_result_db=$(ynh_redis_get_free_db)
 ynh_app_setting_set --app=$app --key=celery_result_db --value=$celery_result_db
 
-redis_unlock "redis_db"
-redis_unlock "celery_broker_db"
+redis_unlock $redis_db
+redis_unlock $celery_broker_db
 
 celery_broker_url=redis://localhost:6379/$celery_broker_db
 
