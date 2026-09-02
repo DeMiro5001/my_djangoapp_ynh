@@ -1,0 +1,21 @@
+[Unit]
+Description=gunicorn daemon for __APP__
+After=network.target
+
+[Service]
+User=__APP__
+Group=www-data
+WorkingDirectory=__INSTALL_DIR__
+Environment="PATH=__INSTALL_DIR__/venv/bin:/usr/local/bin:/usr/bin:/bin"
+EnvironmentFile=__INSTALL_DIR__/.env
+ExecStart=__INSTALL_DIR__/venv/bin/gunicorn \
+    --access-logfile - \
+    --workers 3 \
+    --worker-class gevent \
+    --worker-connections 1000 \
+    --timeout 120 \
+    --bind unix:__INSTALL_DIR__/gunicorn.sock \
+    __PROJECT_NAME__.wsgi:application
+
+[Install]
+WantedBy=multi-user.target

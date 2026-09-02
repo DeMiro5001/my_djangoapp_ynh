@@ -7,112 +7,95 @@
 source _common.sh
 source /usr/share/yunohost/helpers
 
-### Settings are automatically loaded as bash variables
-### in every app script context, therefore typically these will exist:
-### - $domain
-### - $path
-### - $language
-### - $install_dir
-### - $port
-### ...
-
-### In the context of upgrade,
-### - resources are automatically provisioned / updated / deleted (depending on existing resources)
-### - a safety backup is automatically created by the core and will be restored if the upgrade fails
+secret_key=$(ynh_app_setting_get --app=$app --key=secret_key)
+admin_mail=$(ynh_app_setting_get --app=$app --key=admin_mail)
+timezone=$(ynh_app_setting_get --app=$app --key=timezone)
+redis_db=$(ynh_app_setting_get --app=$app --key=redis_db)
+celery_broker_db=$(ynh_app_setting_get --app=$app --key=celery_broker_db)
+celery_result_db=$(ynh_app_setting_get --app=$app --key=celery_result_db)
+project_name=$(ynh_app_setting_get --app=$app --key=project_name)
 
 #=================================================
 # STOP SYSTEMD SERVICE
 #=================================================
 ynh_script_progression "Stopping $app's systemd service..."
 
-ynh_systemctl --service="$app" --action="stop"
+ynh_systemctl --service="$app-gunicorn" --action="stop"
 
-#=================================================
-# ENSURE DOWNWARD COMPATIBILITY
-#=================================================
-ynh_script_progression "Ensuring downward compatibility..."
-
-ynh_app_setting_set_default --key=php_upload_max_filesize --value=50M
-ynh_app_setting_set_default --key=php_post_max_size --value=50M
-
-### N.B. : the following setting migration snippets are provided as *EXAMPLES*
-### of what you may want to do in some cases (e.g. a setting was not defined on
-### some legacy installs and you therefore want to initiaze stuff during upgrade)
-
-# If db_name doesn't exist, create it
-# ynh_app_setting_set_default --key=db_name --value="$(ynh_sanitize_dbid --db_name=$app)"
-
-# If install_dir doesn't exist, create it
-# ynh_app_setting_set_default --key=install_dir --value="/var/www/$app"
+if [ "$use_celery" -eq 1 ]; then
+    ynh_systemctl --service="$app-celery" --action="stop"
+    ynh_systemctl --service="$app-celery-beat" --action="stop"
+    ynh_systemctl --service="$app-flower" --action="stop"
+fi
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 ynh_script_progression "Upgrading source files..."
 
-### ynh_setup_source can wipe the destination dir if called with --full_replace.
-### On upgrade, that is certainly what you want, to remove any old source file that
-### does not exist in the new version of the software.
-### You can list with --keep every file/directory to *not* wipe or overwrite,
-### useful for configuration files, data directories, or plugins.
-# Download, check integrity, uncompress and patch the source from manifest.toml
-ynh_setup_source --dest_dir="$install_dir" --full_replace --keep=".env data"
+pushd $install_dir
+    extract_project $project
 
-### $install_dir will automatically be initialized with some decent
-### permissions by default... however, you may need to recursively reapply
-### ownership to all files such as after the ynh_setup_source step
+    if [ -f "$install_dir/.env.example" ]; then
+        ynh_config_add --template="$install_dir/.env.example" --destination="$install_dir/.env"
+    else
+        
+        if [ "$db_engine" = "postgresql" ]; then
+            ynh_config_add --template=".env" --destination="$install_dir/.env"
+        
+        elif [ "$db_engine" = "sqlite" ]; then
+            ynh_config_add --template=".env.sqlite" --destination="$install_dir/.env"
+        fi
+    
+    fi
+
+chmod 400 "$install_dir/.env"
+chown "$app:$app" "$install_dir/.env"
+ 
+    source venv/bin/activate
+    pip install --upgrade -r requirements.txt
+    python manage.py migrate
+    python manage.py collectstatic --noinput
+    deactivate
+popd
+
 chown -R "$app:www-data" "$install_dir"
-
-#=================================================
-# UPDATE A CONFIG FILE
-#=================================================
-ynh_script_progression "Updating $app's configuration files..."
-
-### Same as during install
-###
-### The file will automatically be backed-up if it's found to be manually modified (because
-### ynh_config_add keeps track of the file's checksum)
-
-ynh_config_add --template="some_config_file" --destination="$install_dir/some_config_file"
-
-# FIXME: this should be handled by the core in the future
-### You may need to use chmod 600 instead of 400,
-### for example if the app is expected to be able to modify its own config
-chmod 400 "$install_dir/some_config_file"
-chown "$app:$app" "$install_dir/some_config_file"
-
-### For more complex cases where you want to replace stuff using regexes,
-### you shoud rely on ynh_replace (which is basically a wrapper for sed)
-### When doing so, you also need to manually call ynh_store_file_checksum
-###
-### ynh_replace --match="match_string" --replace="replace_string" --file="$install_dir/some_config_file"
-### ynh_store_file_checksum "$install_dir/some_config_file"
 
 #=================================================
 # REAPPLY SYSTEM CONFIGURATION
 #=================================================
 ynh_script_progression "Upgrading system configurations related to $app..."
 
-### This should be a literal copypaste of what happened in the install's "System configuration" section
-
-ynh_config_add_phpfpm
-
 ynh_config_add_nginx
 
-ynh_config_add_systemd
+ynh_config_add_systemd --service="$app-gunicorn" --template="gunicorn.service"
+yunohost service add "$app-gunicorn" --description="Gunicorn for $app" --log="/var/log/$app/$app-gunicorn.log"
 
-yunohost service add "$app" --description="A short description of the app" --log="/var/log/$app/$app.log"
+if [ "$use_celery" -eq 1 ]; then
+    ynh_config_add_systemd --service="$app-celery" --template="celery.service"
+    ynh_config_add_systemd --service="$app-celery-beat" --template="celery-beat.service"
+    ynh_config_add_systemd --service="$app-flower" --template="flower.service"
+    yunohost service add "$app-celery" --description="Celery for $app" --log="/var/log/$app/$app-celery.log"
+    yunohost service add "$app-celery-beat" --description="Celery beat for $app" --log="/var/log/$app/$app-celery-beat.log"
+    yunohost service add "$app-flower" --description="Flower for $app" --log="/var/log/$app/$app-flower.log"
+fi
 
 ynh_config_add_logrotate
 
-ynh_config_add_fail2ban --logpath="/var/log/nginx/${domain}-error.log" --failregex="Regex to match into the log for a failed login"
+# ynh_config_add_fail2ban --logpath="/var/log/nginx/${domain}-error.log"
 
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
 ynh_script_progression "Starting $app's systemd service..."
 
-ynh_systemctl --service="$app" --action="start"
+ynh_systemctl --service="$app-gunicorn" --action="start"
+
+if [ "$use_celery" -eq 1 ]; then
+    ynh_systemctl --service="$app-celery" --action="start"
+    ynh_systemctl --service="$app-celery-beat" --action="start"
+    ynh_systemctl --service="$app-flower" --action="start"
+fi
 
 #=================================================
 # END OF SCRIPT
